@@ -1,0 +1,44 @@
+ext {
+    springIntegrationVersion = '5.1.0.RC1'
+    springVersion = '5.1.0.RELEASE'
+    springSecurityVersion = '5.1.0.RELEASE'
+}
+apply plugin: 'java'
+
+group = 'com.github'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    maven { url "https://repo.spring.io/snapshot" }
+    maven { url "https://repo.spring.io/milestone" }
+    maven { url "https://repo.spring.io/release" }
+}
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
+dependencies {
+    provided 'org.apache.geode:geode-core:1.6.0'
+    provided 'org.apache.geode:geode-wan:1.6.0'
+    compile "org.springframework:spring-core:$springVersion"
+    compile "org.springframework:spring-context:$springVersion"
+    compile "org.springframework:spring-beans:$springVersion"
+    compile "org.springframework:spring-messaging:$springVersion"
+    compile "org.springframework.integration:spring-integration-core:$springIntegrationVersion"
+    compile 'org.springframework.integration:spring-integration-aws:1.1.0.RELEASE'
+    testCompile 'io.codearte.jfairy:jfairy:0.5.9'
+    testCompile 'org.projectlombok:lombok:1.16.20'
+}
+
+task copyDependancies(type: Copy) {
+    into "$buildDir/dependancies"
+    from(configurations.compile - configurations.provided)
+}
+
+jar {
+    dependsOn copyDependancies
+}
