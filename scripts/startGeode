@@ -30,7 +30,6 @@ DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --J=-XX:+UseCMSInitiatingOccupancyOnly"
 DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --J=-XX:+ScavengeBeforeFullGC"
 DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --J=-XX:+CMSScavengeBeforeRemark"
 DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --J=-XX:+UseCompressedOops"
-DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --J=-Dgemfire.excludeThreadContextClassLoader=true"
 DEFAULT_JVM_OPTS="$DEFAULT_JVM_OPTS --mcast-port=0"
 
 
@@ -45,14 +44,19 @@ do
 done
 
 mkdir -p ${APP_HOME}/data/locator
-mkdir -p ${APP_HOME}/data/server1
-mkdir -p ${APP_HOME}/data/server2
 
 
 gfsh << EOF
    start locator ${DEFAULT_LOCATOR_MEMORY} ${DEFAULT_JVM_OPTS} --name=locator --port=10334 --dir=${APP_HOME}/data/locator
-   configure pdx --read-serialized=true
-   start server ${DEFAULT_SERVER_MEMORY} ${DEFAULT_JVM_OPTS} --name=server1 --locators=localhost[10334] --dir=${APP_HOME}/data/server1 --server-port=0 --classpath=${CLASSPATH}
-   #start server ${DEFAULT_SERVER_MEMORY} ${DEFAULT_JVM_OPTS} --name=server2 --locators=localhost[10334] --dir=${APP_HOME}/data/server2 --server-port=0 --classpath=${CLASSPATH}
+   configure pdx --read-serialized=true --disk-store=DEFAULT
 EOF
 
+for i in {1..3}
+do
+   mkdir -p ${APP_HOME}/data/server${i}
+   gfsh -e "connect --locator=localhost[10334]" -e "start server ${DEFAULT_SERVER_MEMORY} ${DEFAULT_JVM_OPTS} --name=server${i} --locators=localhost[10334] --dir=${APP_HOME}/data/server${i} --server-port=0 --classpath=${CLASSPATH}" &
+done
+
+wait
+
+gfsh -e "connect --locator=localhost[10334]" -e "list members"

@@ -70,6 +70,10 @@ public class Driver {
         }
         stopWatch.stop();
         System.out.println(stopWatch.prettyPrint());
+        stopWatch = new StopWatch("Deleting all of the data on the servers");
+        stopWatch.start();
         customerRegion.removeAll(customerRegion.keySetOnServer());
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
     }
 }

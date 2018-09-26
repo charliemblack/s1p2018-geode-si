@@ -22,6 +22,6 @@ cd "$SAVED" >&-
 
 gfsh << EOF
 connect --locator=localhost[10334]
-create async-event-queue --id=s3-queue --listener=com.github.sigeode.AsyncS3Sink --listener-param=sigeode.awsregion#us-east-1 --batch-time-interval=1000 --batch-size=1000 --parallel=true --dispatcher-threads=2
+create async-event-queue --id=s3-queue --listener=com.github.sigeode.AsyncS3Sink --listener-param=sigeode.awsregion#us-east-1 --batch-time-interval=1000 --batch-size=1000 --parallel=true --dispatcher-threads=2 --persistent=true --order-policy=KEY --enable-batch-conflation=true
 create region --name=test --type=PARTITION --async-event-queue-id=s3-queue
 EOF

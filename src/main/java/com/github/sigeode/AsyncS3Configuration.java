@@ -47,7 +47,6 @@ import java.util.List;
 public class AsyncS3Configuration {
     private static Logger logger = LogService.getLogger();
 
-
     @Bean
     AmazonS3 amazonS3(@Value("${sigeode.awsregion:us-east-1}") String region) {
         AmazonS3ClientBuilder builder = AmazonS3ClientBuilder.standard();
